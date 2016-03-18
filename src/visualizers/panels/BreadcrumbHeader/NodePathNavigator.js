@@ -1,5 +1,6 @@
 define([
-    'js/Constants'
+    'js/Constants',
+    'css!./BreadCrumbHeader.css'
 ], function(
     CONSTANTS
 ) {
@@ -13,8 +14,9 @@ define([
     ProjectNavWithActiveNode.prototype.initialize = function() {
         var breadcrumbContainer = document.createElement('ol');
 
-        breadcrumbContainer.setAttribute('class', 'breadcrumb');
-        breadcrumbContainer.setAttribute('style', 'height:100%');
+        breadcrumbContainer.setAttribute('id', 'crumbs');
+        //breadcrumbContainer.setAttribute('class', 'breadcrumb');
+        //breadcrumbContainer.setAttribute('style', 'height:100%');
         this.pathContainer = $(breadcrumbContainer);
         this.$el.append(breadcrumbContainer);
 
@@ -50,10 +52,10 @@ define([
             node = this.client.getNode(nodeId);
         }
 
-        for (var i = nodes.length-1; i > 0; i--) {
+        for (var i = nodes.length-1; i >= 0; i--) {
             this.addNode(nodes[i]);
         }
-        this.addNode(nodes[0], true);
+        //this.addNode(nodes[0], true);
     };
 
     ProjectNavWithActiveNode.prototype.addNode = function(nodeObj, isActive) {

@@ -1,0 +1,58 @@
+#crumbs ol { white-space: nowrap; height:100% }
+#crumbs li {
+    display: inline-block;
+    line-height: 26px;
+    margin: 0 0px 0 0px;
+    padding: 0 20px;
+    position: relative;
+}
+#crumbs li:before,
+#crumbs li:after {
+    border-right: 1px solid #666666;
+    content: '';
+    display: block;
+    height: 50%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: -1;
+    -moz-transform: skewX(45deg);
+    -ms-transform: skewX(45deg);
+    -o-transform: skewX(45deg);
+    -webkit-transform: skewX(45deg);
+    transform: skewX(45deg);   
+}
+#crumbs li:after {
+    bottom: 0;
+    top: auto;
+    -moz-transform: skewX(-45deg);
+    -ms-transform: skewX(-45deg);
+    -o-transform: skewX(-45deg);
+    -webkit-transform: skewX(-45deg);
+    transform: skewX(-45deg);
+}
+
+#crumbs li:last-of-type:before, 
+#crumbs li:last-of-type:after { 
+    display: none; 
+}
+
+#crumbs li a { 
+   font: bold 24px Sans-Serif;  
+   letter-spacing: -1px; 
+   text-decoration: none;
+}
+
+active { 
+   font: bold 24px Sans-Serif;  
+   letter-spacing: -1px; 
+   text-decoration: none;
+}
+
+#crumbs li:nth-of-type(1) a { color: hsl(0, 0%, 70%); } 
+#crumbs li:nth-of-type(2) a { color: hsl(0, 0%, 65%); } 
+#crumbs li:nth-of-type(3) a { color: hsl(0, 0%, 50%); } 
+#crumbs li:nth-of-type(4) a { color: hsl(0, 0%, 45%); } 
+
+body { padding: 0px; }
