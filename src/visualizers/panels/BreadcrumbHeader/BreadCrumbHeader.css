@@ -1,8 +1,9 @@
 .breadcrumb { 
     padding: 0 0 0 0;
     list-style: none; 
+    text-decoration: none;
     overflow: hidden;
-    font: 12px Helvetica, Arial, Sans-Serif;
+    font: bold 12px Helvetica, Arial, Sans-Serif;
 }
 .breadcrumb li { 
     float: left; 
