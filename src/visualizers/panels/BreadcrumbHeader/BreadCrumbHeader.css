@@ -1,58 +1,68 @@
-#crumbs ol { white-space: nowrap; height:100% }
-#crumbs li {
-    display: inline-block;
-    line-height: 26px;
-    margin: 0 0px 0 0px;
-    padding: 0 20px;
-    position: relative;
+.breadcrumb { 
+    padding: 0 0 0 0;
+    list-style: none; 
+    overflow: hidden;
+    font: 12px Helvetica, Arial, Sans-Serif;
 }
-#crumbs li:before,
-#crumbs li:after {
-    border-right: 1px solid #666666;
-    content: '';
+.breadcrumb li { 
+    float: left; 
+}
+.breadcrumb li a {
+    color: white;
+    text-decoration: none; 
+    padding: 10px 0 10px 55px;
+    background: brown;                   /* fallback color */
+    background: hsla(34,85%,35%,1); 
+    position: relative; 
     display: block;
-    height: 50%;
+    float: left;
+}
+.breadcrumb li a:after { 
+    content: " "; 
+    display: block; 
+    width: 0; 
+    height: 0;
+    border-top: 50px solid transparent;           /* Go big on the size, and let overflow hide */
+    border-bottom: 50px solid transparent;
+    border-left: 30px solid hsla(34,85%,35%,1);
     position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    z-index: -1;
-    -moz-transform: skewX(45deg);
-    -ms-transform: skewX(45deg);
-    -o-transform: skewX(45deg);
-    -webkit-transform: skewX(45deg);
-    transform: skewX(45deg);   
+    top: 50%;
+    margin-top: -50px; 
+    left: 100%;
+    z-index: 2; 
+}	
+.breadcrumb li a:before { 
+    content: " "; 
+    display: block; 
+    width: 0; 
+    height: 0;
+    border-top: 50px solid transparent;           /* Go big on the size, and let overflow hide */
+    border-bottom: 50px solid transparent;
+    border-left: 30px solid white;
+    position: absolute;
+    top: 50%;
+    margin-top: -50px; 
+    margin-left: 1px;
+    left: 100%;
+    z-index: 1; 
+}	
+.breadcrumb li:first-child a {
+    padding-left: 10px;
 }
-#crumbs li:after {
-    bottom: 0;
-    top: auto;
-    -moz-transform: skewX(-45deg);
-    -ms-transform: skewX(-45deg);
-    -o-transform: skewX(-45deg);
-    -webkit-transform: skewX(-45deg);
-    transform: skewX(-45deg);
+.breadcrumb li:nth-child(2) a       { background:        hsla(34,85%,45%,1); }
+.breadcrumb li:nth-child(2) a:after { border-left-color: hsla(34,85%,45%,1); }
+.breadcrumb li:nth-child(3) a       { background:        hsla(34,85%,55%,1); }
+.breadcrumb li:nth-child(3) a:after { border-left-color: hsla(34,85%,55%,1); }
+.breadcrumb li:nth-child(4) a       { background:        hsla(34,85%,65%,1); }
+.breadcrumb li:nth-child(4) a:after { border-left-color: hsla(34,85%,65%,1); }
+.breadcrumb li:nth-child(5) a       { background:        hsla(34,85%,75%,1); }
+.breadcrumb li:nth-child(5) a:after { border-left-color: hsla(34,85%,75%,1); }
+.breadcrumb li:last-child a {
+    background: white !important;
+    color: black;
+    pointer-events: none;
+    cursor: default;
 }
-
-#crumbs li:last-of-type:before, 
-#crumbs li:last-of-type:after { 
-    display: none; 
-}
-
-#crumbs li a { 
-   font: bold 24px Sans-Serif;  
-   letter-spacing: -1px; 
-   text-decoration: none;
-}
-
-active { 
-   font: bold 24px Sans-Serif;  
-   letter-spacing: -1px; 
-   text-decoration: none;
-}
-
-#crumbs li:nth-of-type(1) a { color: hsl(0, 0%, 70%); } 
-#crumbs li:nth-of-type(2) a { color: hsl(0, 0%, 65%); } 
-#crumbs li:nth-of-type(3) a { color: hsl(0, 0%, 50%); } 
-#crumbs li:nth-of-type(4) a { color: hsl(0, 0%, 45%); } 
-
-body { padding: 0px; }
+.breadcrumb li:last-child a:after { border: 0; }
+.breadcrumb li a:hover { background: hsla(34,85%,25%,1); }
+.breadcrumb li a:hover:after { border-left-color: hsla(34,85%,25%,1) !important; }

@@ -14,9 +14,8 @@ define([
     ProjectNavWithActiveNode.prototype.initialize = function() {
         var breadcrumbContainer = document.createElement('ol');
 
-        breadcrumbContainer.setAttribute('id', 'crumbs');
-        //breadcrumbContainer.setAttribute('class', 'breadcrumb');
-        //breadcrumbContainer.setAttribute('style', 'height:100%');
+        breadcrumbContainer.setAttribute('class', 'breadcrumb');
+        breadcrumbContainer.setAttribute('style', 'height:100%');
         this.pathContainer = $(breadcrumbContainer);
         this.$el.append(breadcrumbContainer);
 
