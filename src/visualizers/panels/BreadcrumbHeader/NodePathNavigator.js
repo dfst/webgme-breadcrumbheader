@@ -1,5 +1,6 @@
 define([
-    'js/Constants'
+    'js/Constants',
+    'css!./BreadCrumbHeader.css'
 ], function(
     CONSTANTS
 ) {
@@ -50,10 +51,10 @@ define([
             node = this.client.getNode(nodeId);
         }
 
-        for (var i = nodes.length-1; i > 0; i--) {
+        for (var i = nodes.length-1; i >= 0; i--) {
             this.addNode(nodes[i]);
         }
-        this.addNode(nodes[0], true);
+        //this.addNode(nodes[0], true);
     };
 
     ProjectNavWithActiveNode.prototype.addNode = function(nodeObj, isActive) {
