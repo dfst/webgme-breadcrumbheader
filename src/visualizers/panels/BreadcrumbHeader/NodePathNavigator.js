@@ -1,5 +1,6 @@
 define([
-    'js/Constants'
+    'js/Constants',
+    'css!./styles/node-navigator.css'
 ], function(
     CONSTANTS
 ) {
@@ -111,11 +112,6 @@ define([
         // TODO
 
         // What if things are moved/deleted?
-        // TODO
-    };
-
-    ProjectNavWithActiveNode.prototype.selectNode = function(node) {
-        // Change the activeNode to the selected node
         // TODO
     };
 
