@@ -4,6 +4,6 @@ This library contains an alternative visualizer for the webgme header. It replac
 ## Quick start
 First, install the header to your webgme app.
 ```
-    webgme add viz webgme-breadcrumbheader
+    webgme import viz webgme-breadcrumbheader
 ```
 Next, add it to your current layout! An example can be found in [deepforge-caffe](https://github.com/dfst/deepforge-caffe)
