@@ -21,6 +21,9 @@ define([
         this.config = WebGMEGlobal.componentSettings[this.getComponentId()] ||
             DEFAULT_CONFIG;
 
+        this.territories = {};
+        this.territoryId = null;
+        this._nodes = {};
         this.initialize();
     };
 
@@ -57,7 +60,11 @@ define([
 
     ProjectNavWithActiveNode.prototype.clear = function(model, nodeId) {
         this.pathContainer.empty();
-        // TODO: clear territories
+        if (this.territoryId) {
+            this.client.removeUI(this.territoryId);
+        }
+        this._nodes = {};
+        this.territories = {};
     };
 
     ProjectNavWithActiveNode.prototype.updatePath = function(model, nodeId) {
@@ -85,6 +92,25 @@ define([
         for (var i = nodes.length-1; i >= 0; i--) {
             this.addNode(nodes[i]);
         }
+
+        // update the territory
+        this.territoryId = this.client.addUI(this, this.eventHandler.bind(this));
+        this.client.updateTerritory(this.territoryId, this.territories);
+    };
+
+    ProjectNavWithActiveNode.prototype.eventHandler = function(events) {
+        for (var i = events.length; i--;) {
+            if (events[i].etype === CONSTANTS.TERRITORY_EVENT_UPDATE) {
+                this.updateNode(events[i].eid);
+            }
+        }
+    };
+
+    ProjectNavWithActiveNode.prototype.updateNode = function(id) {
+        var node = this.client.getNode(id),
+            name = node.getAttribute('name');
+
+        this._nodes[id].innerHTML = name;
     };
 
     ProjectNavWithActiveNode.prototype.addNode = function(nodeObj, isActive) {
@@ -97,22 +123,17 @@ define([
         if (isActive) {
             item.setAttribute('class', 'active');
             item.innerHTML = node.getAttribute('name');
+            this._nodes[id] = item;
         } else {
             anchor.innerHTML = node.getAttribute('name');
+            this._nodes[id] = anchor;
             item.appendChild(anchor);
             item.addEventListener('click', 
                 WebGMEGlobal.State.registerActiveObject.bind(WebGMEGlobal.State, id));
         }
 
+        this.territories[id] = {children: 0};
         this.pathContainer.append(item);
-    };
-
-    ProjectNavWithActiveNode.prototype.updateNode = function() {
-        // Update the node name, if needed
-        // TODO
-
-        // What if things are moved/deleted?
-        // TODO
     };
 
     return ProjectNavWithActiveNode;
