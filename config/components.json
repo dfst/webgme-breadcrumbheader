@@ -1,5 +1,6 @@
 {
-    "BreadCrumbHeader": {
-        "style": "simple"
+    "BreadcrumbHeader": {
+        "style": "simple",
+        "rootId": ""
     }
 }
