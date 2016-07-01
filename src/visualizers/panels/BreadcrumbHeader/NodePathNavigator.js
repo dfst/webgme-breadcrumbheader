@@ -55,7 +55,7 @@ define([
     };
 
     ProjectNavWithActiveNode.prototype.getComponentId = function() {
-        return 'BreadCrumbHeader';
+        return 'BreadcrumbHeader';
     };
 
     ProjectNavWithActiveNode.prototype.clear = function(model, nodeId) {
