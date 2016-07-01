@@ -6,7 +6,8 @@ define([
 ) {
 
     var DEFAULT_CONFIG = {
-            style: 'simple'
+            style: 'simple',
+            rootId: ''
         },
         STYLES = {
             arrows: 'panels/BreadcrumbHeader/styles/arrows.css'
@@ -55,7 +56,7 @@ define([
     };
 
     ProjectNavWithActiveNode.prototype.getComponentId = function() {
-        return 'BreadCrumbHeader';
+        return 'BreadcrumbHeader';
     };
 
     ProjectNavWithActiveNode.prototype.clear = function(model, nodeId) {
@@ -69,7 +70,7 @@ define([
 
     ProjectNavWithActiveNode.prototype.updatePath = function(model, nodeId) {
         var node = this.client.getNode(nodeId),
-            baseId,
+            prevId,
             nodes = [];
 
         if (!node) {
@@ -80,16 +81,16 @@ define([
         this.clear();
 
         // Populate the bar with the nodes from the root to the active node
-        while (!!node) {
-            baseId = node.getParentId();
-            nodes.push({id: nodeId, node: node});
+        while (node && (prevId !== this.config.rootId)) {
+            nodes.unshift(node);
 
             // Get the next
-            nodeId = baseId;
+            prevId = nodeId;
+            nodeId = node.getParentId();
             node = this.client.getNode(nodeId);
         }
 
-        for (var i = nodes.length-1; i >= 0; i--) {
+        for (var i = 0; i < nodes.length; i++) {
             this.addNode(nodes[i]);
         }
 
@@ -113,12 +114,11 @@ define([
         this._nodes[id].innerHTML = name;
     };
 
-    ProjectNavWithActiveNode.prototype.addNode = function(nodeObj, isActive) {
+    ProjectNavWithActiveNode.prototype.addNode = function(node, isActive) {
         // Set the territory for the node (in case of rename)
         var item = document.createElement('li'),
             anchor = document.createElement('a'),
-            id = nodeObj.id,
-            node = nodeObj.node;
+            id = node.getId();
 
         if (isActive) {
             item.setAttribute('class', 'active');
