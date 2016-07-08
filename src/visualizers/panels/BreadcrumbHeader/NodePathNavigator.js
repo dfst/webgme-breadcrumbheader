@@ -5,9 +5,14 @@ define([
     CONSTANTS
 ) {
 
-    var DEFAULT_CONFIG = {
+    var RULES = {
+            CONTAINMENT: 'containment',
+            HISTORY: 'history'
+        },
+        DEFAULT_CONFIG = {
             style: 'simple',
-            rootId: ''
+            pathRule: RULES.CONTAINMENT,
+            rootId: CONSTANTS.PROJECT_ROOT_ID
         },
         STYLES = {
             arrows: 'panels/BreadcrumbHeader/styles/arrows.css'
@@ -19,12 +24,20 @@ define([
         this.logger = options.logger.fork('NodePath');
 
         // Load the config
-        this.config = WebGMEGlobal.componentSettings[this.getComponentId()] ||
-            DEFAULT_CONFIG;
+        this.config = _.extend({}, DEFAULT_CONFIG,
+            WebGMEGlobal.componentSettings[this.getComponentId()]);
+
+        // Validate the pathRule
+        var rules = Object.keys(RULES).map(rule => RULES[rule]);
+        if (rules.indexOf(this.config.pathRule) === -1) {
+            this.logger.warn(`unknown path rule "${this.config.pathRule}". Falling back to "containment"`);
+            this.config.pathRule = RULES.CONTAINMENT;
+        }
 
         this.territories = {};
         this.territoryId = null;
         this._nodes = {};
+        this._nodeHistory = [CONSTANTS.PROJECT_ROOT_ID];
         this.initialize();
     };
 
@@ -59,13 +72,16 @@ define([
         return 'BreadcrumbHeader';
     };
 
-    ProjectNavWithActiveNode.prototype.clear = function(model, nodeId) {
+    ProjectNavWithActiveNode.prototype.clear = function() {
         this.pathContainer.empty();
         if (this.territoryId) {
             this.client.removeUI(this.territoryId);
         }
         this._nodes = {};
-        this.territories = {};
+        // If the pathRule is 'history', keep the territories
+        if (this.config.pathRule === RULES.CONTAINMENT) {
+            this.territories = {};
+        }
     };
 
     ProjectNavWithActiveNode.prototype.updatePath = function(model, nodeId) {
@@ -81,15 +97,7 @@ define([
         this.clear();
 
         // Populate the bar with the nodes from the root to the active node
-        while (node && (prevId !== this.config.rootId)) {
-            nodes.unshift(node);
-
-            // Get the next
-            prevId = nodeId;
-            nodeId = node.getParentId();
-            node = this.client.getNode(nodeId);
-        }
-
+        nodes = this.getNodePath(nodeId);
         for (var i = 0; i < nodes.length; i++) {
             this.addNode(nodes[i]);
         }
@@ -97,6 +105,39 @@ define([
         // update the territory
         this.territoryId = this.client.addUI(this, this.eventHandler.bind(this));
         this.client.updateTerritory(this.territoryId, this.territories);
+    };
+
+    ProjectNavWithActiveNode.prototype.getNodePath = function(nodeId) {
+        var node = this.client.getNode(nodeId),
+            nodes = [],
+            prevId;
+
+        if (this.config.pathRule === RULES.CONTAINMENT) {
+            while (node && (prevId !== this.config.rootId)) {
+                nodes.unshift(node);
+
+                // Get the next
+                prevId = nodeId;
+                nodeId = node.getParentId();
+                node = this.client.getNode(nodeId);
+            }
+            return nodes;
+        } else {  // history
+            // Check for the given nodeId
+            // What if the user reloads the page? We should infer the path to get there...
+            // TODO
+            var i = this._nodeHistory.indexOf(nodeId),
+                len = this._nodeHistory.length,
+                old;
+
+            if (i > -1) {
+                old = this._nodeHistory.splice(i, len-i);
+                old.forEach(id => delete this.territories[id]);
+            }
+
+            this._nodeHistory.push(nodeId);
+            return this._nodeHistory.map(id => this.client.getNode(id));
+        }
     };
 
     ProjectNavWithActiveNode.prototype.eventHandler = function(events) {
