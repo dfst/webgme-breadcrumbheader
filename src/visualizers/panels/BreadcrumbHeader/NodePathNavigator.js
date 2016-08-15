@@ -12,6 +12,7 @@ define([
         DEFAULT_CONFIG = {
             style: 'simple',
             pathRule: RULES.CONTAINMENT,
+            cachePrefix: 'breadcrumb-history',
             rootId: CONSTANTS.PROJECT_ROOT_ID
         },
         STYLES = {
@@ -34,6 +35,8 @@ define([
             this.config.pathRule = RULES.CONTAINMENT;
         }
 
+        this.lastNodeId = null;
+        this.lastProjectId = null;
         this.territories = {};
         this.territoryId = null;
         this._nodes = {};
@@ -102,30 +105,31 @@ define([
             this.addNode(nodes[i]);
         }
 
+        this.lastNodeId = nodeId;
+        this.lastProjectId = this.client.getActiveProjectId();
         // update the territory
         this.territoryId = this.client.addUI(this, this.eventHandler.bind(this));
+        this.logger.debug(`Updating territories: ${Object.keys(this.territories).join(', ')}`);
         this.client.updateTerritory(this.territoryId, this.territories);
     };
 
     ProjectNavWithActiveNode.prototype.getNodePath = function(nodeId) {
         var node = this.client.getNode(nodeId),
-            nodes = [],
+            nodeIds = [],
             prevId;
 
         if (this.config.pathRule === RULES.CONTAINMENT) {
             while (node && (prevId !== this.config.rootId)) {
-                nodes.unshift(node);
+                nodeIds.unshift(nodeId);
 
                 // Get the next
                 prevId = nodeId;
                 nodeId = node.getParentId();
                 node = this.client.getNode(nodeId);
             }
-            return nodes;
+            return nodeIds;
         } else {  // history
             // Check for the given nodeId
-            // What if the user reloads the page? We should infer the path to get there...
-            // TODO
             var i = this._nodeHistory.indexOf(nodeId),
                 len = this._nodeHistory.length,
                 old;
@@ -136,13 +140,40 @@ define([
             }
 
             this._nodeHistory.push(nodeId);
-            return this._nodeHistory.map(id => this.client.getNode(id));
+            this.updateFromLocalStorage(nodeId);
+
+            return this._nodeHistory;
+        }
+    };
+
+    ProjectNavWithActiveNode.prototype.updateFromLocalStorage = function(nodeId) {
+        if (typeof localStorage !== 'undefined') {
+            // If there is no node history, check in the localStorage
+            var pId = this.client.getActiveProjectId(),
+                id = `${this.config.cachePrefix}-${pId}-${nodeId}`,  // TODO: provide id
+                lastId;
+
+            if (this.lastNodeId === null && localStorage[id]) {  // first load
+                this._nodeHistory = localStorage[id].split('_');
+                this.logger.debug(`Retrieving path to ${nodeId} from browser (${this._nodeHistory.join(', ')})`);
+            }
+
+            // Remove the previous value
+            if (this.lastNodeId) {
+                lastId = `${this.config.cachePrefix}-${this.lastProjectId}-${this.lastNodeId}`;
+                delete localStorage[lastId];
+            }
+
+            // Store the nodeHistory in localStorage
+            localStorage[id] = this._nodeHistory.join('_');
+            this.logger.debug(`Storing path to ${nodeId} in browser`);
         }
     };
 
     ProjectNavWithActiveNode.prototype.eventHandler = function(events) {
         for (var i = events.length; i--;) {
-            if (events[i].etype === CONSTANTS.TERRITORY_EVENT_UPDATE) {
+            if (events[i].etype === CONSTANTS.TERRITORY_EVENT_UPDATE ||
+                events[i].etype === CONSTANTS.TERRITORY_EVENT_LOAD) {
                 this.updateNode(events[i].eid);
             }
         }
@@ -155,18 +186,15 @@ define([
         this._nodes[id].innerHTML = name;
     };
 
-    ProjectNavWithActiveNode.prototype.addNode = function(node, isActive) {
+    ProjectNavWithActiveNode.prototype.addNode = function(id, isActive) {
         // Set the territory for the node (in case of rename)
         var item = document.createElement('li'),
-            anchor = document.createElement('a'),
-            id = node.getId();
+            anchor = document.createElement('a');
 
         if (isActive) {
             item.setAttribute('class', 'active');
-            item.innerHTML = node.getAttribute('name');
             this._nodes[id] = item;
         } else {
-            anchor.innerHTML = node.getAttribute('name');
             this._nodes[id] = anchor;
             item.appendChild(anchor);
             item.addEventListener('click', 
