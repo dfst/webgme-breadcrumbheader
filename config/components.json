@@ -1,6 +1,7 @@
 {
     "BreadcrumbHeader": {
         "style": "simple",
+        "cachePrefix": "testPrefix",
         "rootId": ""
     }
 }
